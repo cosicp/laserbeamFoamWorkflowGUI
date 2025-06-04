@@ -1,1 +1,1 @@
-# laserbeamFoamWorkflowGUI
+# laserbeamFoam - Workbench
