@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JStress</title>
+  <link href="code/CSS/roundslider.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="code/CSS/main.css">
+</head>
+
+<body>
+  <!-- <script src="scripts/jquery-1.11.3.min.js"></script> -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"> </script>
+  <script type="text/javascript" src="code/JS/LaTexMathML.js"> </script>
+  <script type="text/javascript" src="code/JS/echarts.js"> </script>
+  <!-- <script type="text/javascript" src="code/JS/main.js"> </script> -->
+  <script src="code/JS/roundslider.min.js"></script>
+  <script src="code/JS/math.min.js"></script>
+
+
+
+  <div id="app">
+    <!-- TODO when you touch the rotate button the vectors dont update as they should -->
+    <div id="app_title">
+      JStress v1.0.0
+    </div>
+
+    <div id="container">
+      <div id="circle_and_cube">
+        <div id="circle">
+          <canvas id="mainCanvas"></canvas>
+        </div>
+        <div id="cube"></div>
+      </div>
+      <div id="controlls">
+        <div id="input_stress_tensor">
+          <div id="stress_input_container">
+            <span id="input_stress_tensor_span">Input stress tensor $[MPa]$</span>
+
+            <span>$\sigma_{xx}$</span> <input id="input_sigmaxx" class="stress_input" type="number"
+              placeholder="sigmaxx" value="10"> <span>$\tau_{xy}$<input id="input_tauxy" class="stress_input"
+                value="201" type="number" placeholder="tauxy"> <span> $\tau_{xz}$ </span> <input id="input_tauxz"
+                class="stress_input" type="number" placeholder="tauxz" value="40"> <br>
+              <span>$\tau_{yx}$</span> <input id="input_tauyx" class="stress_input" type="number" placeholder="tauyx"
+                disabled value="201"> <span>$\sigma_{yy}$</span><input id="input_sigmayy" class="stress_input"
+                type="number" placeholder="sigmayy" value="20"> <span>$\tau_{yz}$&nbsp;</span> <input id="input_tauyz"
+                class="stress_input" type="number" placeholder="tauyz" value="10"> <br>
+              <span>$\tau_{zx}$</span> <input class="stress_input" id="input_tauzx" type="number" placeholder="tauzx"
+                disabled value="40"> <span>$\tau_{zy}$</span> <input id="input_tauzy" disabled value="10"
+                class="stress_input" type="number" placeholder="tauzy"> <span>$\sigma_{zz}$</span> <input
+                id="input_sigmazz" class="stress_input" type="number" placeholder="sigmazz" value="30"> <br>
+              <button id="update-button">Update</button>
+          </div>
+        </div>
+
+        <div id="output_info">
+
+          <div id="output_stresses">
+            <div id="output_stresses_title">
+              Current stress tensor $[MPa]$
+            </div>
+
+            <input id="output_sigmaxx" readonly class="stress_output" type="number" placeholder="sigmaxx" value="10">
+            <input readonly id="output_tauxy" class="stress_output" value="30" type="number" placeholder="tauxy"> <input
+              readonly id="output_tauxz" class="stress_output" type="number" placeholder="tauxz" value="40"> <br>
+            <input id="output_tauyx" readonly class="stress_output" type="number" placeholder="tauyx" value="30"> <input
+              readonly id="output_sigmayy" class="stress_output" type="number" placeholder="sigmayy" value="20"> <input
+              readonly id="output_tauyz" class="stress_output" type="number" placeholder="tauyz" value="10"> <br>
+            <input class="stress_output" readonly id="output_tauzx" type="number" placeholder="tauzx" value="40"> <input
+              readonly id="output_tauzy" value="10" class="stress_output" type="number" placeholder="tauzy"> <input
+              readonly id="output_sigmazz" class="stress_output" type="number" placeholder="sigmazz" value="30"> <br>
+            <button id="align-button">Align with principal dir</button>
+
+          </div>
+
+
+          <div id="principa_values_and_dir">
+            <span id="princ_values_span">Principal values $[MPa]$</span>
+
+            &nbsp; <span>$\sigma_{1}$</span> <input class="stress_output" readonly id="sigma_11" type="number"
+              placeholder="sigma_11" value="40"> <span>$\sigma_{2}$</span> <input readonly id="sigma_22" value="10"
+              class="stress_output" type="number" placeholder="sigma_22"> <span>$\sigma_{3}$</span> <input readonly
+              id="sigma_33" class="stress_output" type="number" placeholder="sigma_33"> <br>
+
+            <span id="princ_dir_span">Principal directions</span>
+
+            <span>$n_{1x}$</span> <input class="stress_output" readonly id="n1x" type="number" placeholder="n1x"
+              value="40">
+            <span>$n_{1y}$</span><input readonly id="n1y" value="10" class="stress_output" type="number"
+              placeholder="n1y">
+            <span>$n_{1z}$</span><input readonly id="n1z" class="stress_output" type="number" placeholder="n1z"> <br>
+
+            <span>$n_{2x}$</span> <input class="stress_output" readonly id="n2x" type="number" placeholder="n2x"
+              value="40">
+            <span>$n_{2y}$</span><input readonly id="n2y" value="10" class="stress_output" type="number"
+              placeholder="n2y">
+            <span>$n_{2z}$</span><input readonly id="n2z" class="stress_output" type="number" placeholder="n2z"> <br>
+
+            <span>$n_{3x}$</span> <input class="stress_output" readonly id="n3x" type="number" placeholder="n3x"
+              value="40">
+            <span>$n_{3y}$</span><input readonly id="n3y" value="10" class="stress_output" type="number"
+              placeholder="n3y">
+            <span>$n_{3z}$</span><input readonly id="n3z" class="stress_output" type="number" placeholder="n3z"> <br>
+          </div>
+
+        </div>
+
+
+        <div id="angle_controlls">
+          <div class="angle_controlls">
+            <div class="container">
+              <div class="control">
+                <div id="alfa"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="angle_controlls">
+            <div class="container">
+              <div class="control">
+                <div id="beta"></div>
+              </div>
+            </div>
+          </div>
+          <div class="angle_controlls">
+            <div class="container">
+              <div class="control">
+                <div id="gamma"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+
+  <script type="importmap">
+{
+    "imports": {
+        "three": "https://threejs.org/build/three.module.js",
+        "three/addons/": "https://threejs.org/examples/jsm/"
+    }
+}</script>
+
+  <script type="module">
+
+    import *as THREE from "three"
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    // Set up the scene
+    const scene = new THREE.Scene();
+    // Set up the camera
+    const camera = new THREE.PerspectiveCamera(
+      75, // Field of view
+      1, // Aspect ratio
+      0.1, // Near clipping plane
+      1000 // Far clipping plane
+    );
+
+    // Position the camera slightly away from the cube so we can see it
+    camera.position.z = 2.2 - 0.5;
+    camera.position.x = -1.8 + 0.5;
+    camera.position.y = 1.7 - 0.5;
+
+  // Set the background to a solid color (e.g., light blue)
+    scene.background = new THREE.Color("rgb(255, 255, 255)"); // Hex color for light blue
+
+    // Set up the renderer and attach it to the document
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(580, 580);
+    document.getElementById("cube").appendChild(renderer.domElement);
+    $(renderer.domElement).attr("id","renderer_dom")
+
+    // Create a geometry for the cube
+    const geometry = new THREE.BoxGeometry();
+
+    // Create a basic material and set its color to blue
+    const material = new THREE.MeshBasicMaterial({ color: "#cccccc" });
+
+    // Create a mesh by combining the geometry and material
+    const cube = new THREE.Mesh(geometry, material);
+    cube.scale.set(1, 1, 1); // Uniform scaling
+    // Add the cube to the scene
+    scene.add(cube);
+
+    const direction = new THREE.Vector3(1, 0, 0);  // The direction the arrow points
+    const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000,linewidth:4 });
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    animate();
+    // Create the edges geometry and material
+    var EdgesGeometry = new THREE.EdgesGeometry(cube.geometry);
+    // Create the edges line object
+    var edges = new THREE.LineSegments(EdgesGeometry, edgeMaterial);
+    // edges.edgeMaterial.lineWidth =3
+    scene.add(edges);
+
+    // ONLOAD
+
+    $(document).ready(function () {
+
+      $("#alfa").roundSlider({
+        // sliderType: "min-range",
+        svgMode: true,
+        borderWidth: 1,
+        borderColor: "black",
+        // pathColor: null,
+        // rangeColor: null,
+        // tooltipColor: null,
+        min: 0,
+        max: 360,
+        step: 1,
+        animation: true,
+        value: 0,
+        radius: 70
+      });
+
+
+      $("#beta").roundSlider({
+        svgMode: true,
+        borderWidth: 1,
+        borderColor: "black",
+        // pathColor: null,
+        // rangeColor: null,
+        // tooltipColor: null,
+        radius: 70,
+        min: 0,
+        max: 360,
+        step: 1,
+        animation: true,
+        value: 0,
+      });
+
+      $("#gamma").roundSlider({
+        svgMode: true,
+        borderWidth: 1,
+        borderColor: "black",
+        // pathColor: null,
+        // rangeColor: null,
+        // tooltipColor: null,
+        radius: 70,
+        min: 0,
+        max: 360,
+        step: 1,
+        animation: true,
+        value: 0,
+      });
+
+      cube.rotation.x =  $("#alfa").roundSlider("option", "value") * 3.14 / 180
+      cube.rotation.y =  $("#beta").roundSlider("option", "value") * 3.14 / 180
+      cube.rotation.z =  $("#gamma").roundSlider("option", "value") * 3.14 / 180
+      edges.rotation.x = $("#alfa").roundSlider("option", "value") * 3.14 / 180
+      edges.rotation.y = $("#beta").roundSlider("option", "value") * 3.14 / 180
+      edges.rotation.z = $("#gamma").roundSlider("option", "value") * 3.14 / 180
+
+
+      // Arrow parameters
+      const shaftRadius = 0.02;  // Shaft width (radius)
+
+      var translate = 3;
+      var translate3 = 1;
+      var translate2 = 0.8;
+
+      // Create a cylinder for the shaft (arrow shaft)
+      const shaftGeometry = new THREE.CylinderGeometry(shaftRadius, shaftRadius, 3, 1000);
+      const shaftMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Blue shaft
+      const shaft = new THREE.Mesh(shaftGeometry, shaftMaterial);
+      shaft.position.x = 2 - translate3
+      shaft.position.y = 0.7 - translate2
+      shaft.position.z = 2 - translate
+      scene.add(shaft);
+
+      // Create a cylinder for the shaft (arrow shaft)
+      const shaft2 = new THREE.Mesh(shaftGeometry, shaftMaterial);
+      shaft2.position.x = 2 - translate3
+      shaft2.position.y = -0.43 - translate2
+      shaft2.position.z = 3.2 - translate
+      shaft2.rotation.x = 90 * 3.14 / 180
+      scene.add(shaft2);
+
+      // Create a cylinder for the shaft (arrow shaft)
+      const shaft3 = new THREE.Mesh(shaftGeometry, shaftMaterial);
+      shaft3.position.x = 0.85 - translate3
+      shaft3.position.y = -0.43 - translate2
+      shaft3.position.z = 2 - translate
+      shaft3.rotation.z = 90 * 3.14 / 180
+      scene.add(shaft3);
+
+      // direction.position.x = 0.85 - translate
+      // direction.position.y = -0.43 - translate2
+      // direction.position.z = 2 - translate
+      update()
+    });
+
+    var mainCanvas = document.getElementById('mainCanvas');
+    var ctx_main = mainCanvas.getContext('2d');
+
+    mainCanvas.width = 760;
+    mainCanvas.height = 580;
+
+    var x_center = 380;
+    var y_center = 290;
+
+    ctx_main.strokeStyle = 'rgb(50, 50, 50)';  // Circle fill color
+    ctx_main.lineWidth = '1';  // Circle fill color
+    ctx_main.beginPath();
+    ctx_main.moveTo(x_center, 0);
+    ctx_main.lineTo(x_center, 580);
+    ctx_main.stroke();
+
+    ctx_main.beginPath();
+    ctx_main.moveTo(0, 301);
+    ctx_main.lineTo(760, 301);
+    ctx_main.stroke();
+
+    // Set grid spacing
+    const gridSize = 40; // Size of each grid cell
+
+    // Set canvas dimensions
+    const width = mainCanvas.width;
+    const height = mainCanvas.height;
+
+    var y_offset = gridSize / 2 + 10
+    var x_offset = gridSize / 2
+
+    // Draw the grid when the page loads
+    drawGrid();
+
+    $("#update-button").on("click", update)
+
+    $("#input_sigmaxx").on("input propertychange", function (e) {
+      calc()
+      update()
+    })
+
+    $("#input_sigmayy").on("input propertychange", function (e) {
+      calc()
+      update()
+    })
+
+    $("#input_sigmazz").on("input propertychange", function (e) {
+      calc()
+      update()
+    })
+
+    $("#input_tauxy").on("input propertychange", function (e) {
+      $("#input_tauyx").val($(e.target).val())
+      calc()
+      update()
+    })
+
+    $("#input_tauxz").on("input propertychange", function (e) {
+      $("#input_tauzx").val($(e.target).val())
+      calc()
+      update()
+    })
+    $("#input_tauyz").on("input propertychange", function (e) {
+      $("#input_tauzy").val($(e.target).val())
+      calc()
+      update()
+    })
+
+
+    $("#alfa").on("drag", function (e) {
+      cube.rotation.x = -1 * e.value * 3.14 / 180
+      edges.rotation.x = -1 * e.value * 3.14 / 180
+      calc()
+    })
+
+    $("#alfa").on("change", function (e) {
+      cube.rotation.x = -1 * e.value * 3.14 / 180
+      edges.rotation.x = -1 * e.value * 3.14 / 180
+      calc()
+    })
+
+    $("#beta").on("drag", function (e) {
+      cube.rotation.y = e.value * 3.14 / 180
+      edges.rotation.y = e.value * 3.14 / 180
+      calc()
+    })
+
+    $("#beta").on("change", function (e) {
+      cube.rotation.y =  e.value * 3.14 / 180
+      edges.rotation.y =   e.value * 3.14 / 180
+      calc()
+    })
+
+    $("#gamma").on("drag", function (e) {
+      cube.rotation.z =   e.value * 3.14 / 180
+      edges.rotation.z =  e.value * 3.14 / 180
+      calc()
+    })
+
+    $("#gamma").on("change", function (e) {
+      cube.rotation.z = e.value * 3.14 / 180
+      edges.rotation.z = e.value * 3.14 / 180
+      calc()
+    })
+
+
+    // ############################################  Functions   ######################################################
+
+
+    function drawArrows() {
+
+      
+      // Array to hold transformed corner positions
+      const transformedCorners = [];
+
+      // Access the geometry's position attribute (vertices)
+      const positionAttribute = cube.geometry.attributes.position;
+      
+      // Loop over the vertices (each vertex has x, y, z coordinates)
+      for (let i = 0; i < positionAttribute.count; i++) {
+        // Get the local vertex position
+        const localVertex = new THREE.Vector3();
+        localVertex.fromBufferAttribute(positionAttribute, i);
+        // Apply the cube's world matrix to get the world position of the vertex
+        const worldVertex = localVertex.clone().applyMatrix4(cube.matrixWorld);
+        // Store the transformed vertex
+        transformedCorners.push(worldVertex);
+      }
+
+      var top_coordinates = [0, 1, 4, 5];
+      var front_coordinates = [14, 15, 4, 5];
+      var side_coordinates = [5, 6, 12, 13];
+
+      var coord = [top_coordinates, front_coordinates, side_coordinates]
+
+      var directions = []
+      var directions05 = []
+
+      for (let i = 0; i < coord.length; i++) {
+        var side = coord[i]
+        var corner_1_coord = transformedCorners[side[0]]
+        var corner_2_coord = transformedCorners[side[1]]
+        var corner_3_coord = transformedCorners[side[2]]
+        var corner_4_coord = transformedCorners[side[3]]
+
+        var corner_1_vec = [corner_1_coord.x, corner_1_coord.y, corner_1_coord.z]
+        var corner_2_vec = [corner_2_coord.x, corner_2_coord.y, corner_2_coord.z]
+        var corner_3_vec = [corner_3_coord.x, corner_3_coord.y, corner_3_coord.z]
+
+        var AB = math.subtract(corner_1_vec, corner_2_vec)
+        var AC = math.subtract(corner_1_vec, corner_3_vec)
+        var normal_unit = math.divide(math.cross(AB, AC), math.norm(math.cross(AB, AC)))
+        directions.push(new THREE.Vector3(normal_unit[0], normal_unit[1], normal_unit[2]))
+        directions05.push(new THREE.Vector3(normal_unit[0]*0.51, normal_unit[1] * 0.51, normal_unit[2] * 0.51 ))
+      }
+
+      var indexx = []
+      for (let i = 0; i < scene.children.length; i++) {
+        var element = scene.children[i]
+        if (element.type == "ArrowHelper") {
+          indexx.push(i)
+        }
+      }
+
+      scene.children = scene.children.filter((_, index) => !indexx.includes(index));
+
+      for (let i = 0; i < directions.length; i++) {
+        // Define the origin point of the vector
+        const dir = directions[i] 
+        const origin = new THREE.Vector3(dir.x*0.51, dir.y * 0.51, dir.z* 0.51);
+        // Define the length of the vector
+        const length = 0.27;
+        // Optional: Define color and other parameters
+        const hexColor = 0xff0000; // Red color
+        const headLength = 0.08; // Length of the arrowhead
+        const headWidth = 0.07; // Width of the arrowhead
+        // Create the ArrowHelper
+
+        var colors = [0xff0000, 0x0000ff, 0x00ff00]
+
+        const arrowHelper = new THREE.ArrowHelper(directions[i], origin, length, colors[i], headLength, headWidth);
+        scene.add(arrowHelper);
+
+        var arrowHelper1 = new THREE.ArrowHelper(directions[2], directions05[0], length, colors[0], headLength, headWidth);
+        var arrowHelper5 = new THREE.ArrowHelper(directions[1], directions05[0], length, colors[0], headLength, headWidth);
+        
+        var arrowHelper2 = new THREE.ArrowHelper(directions[0], directions05[1], length, colors[1], headLength, headWidth);
+        var arrowHelper6 = new THREE.ArrowHelper(directions[2], directions05[1], length, colors[1], headLength, headWidth);
+
+        var arrowHelper3 = new THREE.ArrowHelper(directions[0], directions05[2], length, colors[2], headLength, headWidth);
+        var arrowHelper4 = new THREE.ArrowHelper(directions[1], directions05[2], length, colors[2], headLength, headWidth);
+
+        scene.add(arrowHelper1);
+        scene.add(arrowHelper2);
+        scene.add(arrowHelper3);
+        scene.add(arrowHelper4);
+        scene.add(arrowHelper5);
+        scene.add(arrowHelper6);
+      }
+    }
+
+
+    function getInputStesses() {
+      var sigmaxx = Number($("#input_sigmaxx").val())
+      var sigmayy = Number($("#input_sigmayy").val())
+      var sigmazz = Number($("#input_sigmazz").val())
+      var tauxy = Number($("#input_tauxy").val())
+      var tauyx = Number($("#input_tauyx").val())
+      var tauxz = Number($("#input_tauxz").val())
+      var tauzx = Number($("#input_tauzx").val())
+      var tauyz = Number($("#input_tauyz").val())
+      var tauzy = Number($("#input_tauzy").val())
+      return [[sigmaxx, tauxy, tauxz], [tauyx, sigmayy, tauyz], [tauzx, tauzy, sigmazz]]
+    }
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      // Update the controls to enable smooth interaction
+      controls.update();
+      // Render the scene from the perspective of the camera
+      renderer.render(scene, camera);
+    }
+
+    function calc() {
+      var sigma = getInputStesses()
+      var R = calcRotationMatrix()
+      var sigma_new = math.multiply(R, math.multiply(sigma, math.transpose(R)))
+      var eigs = math.eigs(sigma_new)
+      updateResults(sigma_new, eigs)
+    }
+
+    function calcRotationMatrix() {
+      var alpha = $("#alfa").roundSlider("option", "value") * 3.14 / 180 
+      var beta =  $("#beta").roundSlider("option", "value") * 3.14 / 180
+      var gamma = $("#gamma").roundSlider("option", "value") * 3.14 / 180
+
+      return [[math.cos(beta * math.pi / 180) * math.cos(gamma * math.pi / 180), -math.cos(beta * math.pi / 180) * math.sin(gamma * math.pi / 180), math.sin(beta * math.pi / 180)],
+      [math.cos(alpha * math.pi / 180) * math.sin(gamma * math.pi / 180) + math.cos(gamma * math.pi / 180) * math.sin(alpha * math.pi / 180) * math.sin(beta * math.pi / 180), math.cos(alpha * math.pi / 180) * math.cos(gamma * math.pi / 180) - math.sin(alpha * math.pi / 180) * math.sin(beta * math.pi / 180) * math.sin(gamma * math.pi / 180), -math.cos(beta * math.pi / 180) * math.sin(alpha * math.pi / 180)],
+      [math.sin(alpha * math.pi / 180) * math.sin(gamma * math.pi / 180) - math.cos(alpha * math.pi / 180) * math.cos(gamma * math.pi / 180) * math.sin(beta * math.pi / 180), math.cos(gamma * math.pi / 180) * math.sin(alpha * math.pi / 180) + math.cos(alpha * math.pi / 180) * math.sin(beta * math.pi / 180) * math.sin(gamma * math.pi / 180), math.cos(alpha * math.pi / 180) * math.cos(beta * math.pi / 180)]];
+    }
+
+
+    function updateResults(sigma, eigs) {
+
+        var eigvals = eigs.values.toSorted(function (x, y) { return x - y })
+        var eigvec = sortVec(eigs.values, eigvals, eigs.vectors)
+
+        $("#sigma_11").val(math.round(eigvals[0], 3))
+        $("#sigma_22").val(math.round(eigvals[1], 3))
+        $("#sigma_33").val(math.round(eigvals[2], 3))
+
+        $("#output_sigmaxx").val(math.round(sigma[0][0], 3))
+        $("#output_sigmayy").val(math.round(sigma[1][1], 3))
+        $("#output_sigmazz").val(math.round(sigma[2][2], 3))
+        $("#output_tauxy").val(math.round(sigma[0][1], 3))
+        $("#output_tauyx").val(math.round(sigma[0][1], 3))
+        $("#output_tauxz").val(math.round(sigma[0][2], 3))
+        $("#output_tauzx").val(math.round(sigma[0][2], 3))
+        $("#output_tauyz").val(math.round(sigma[1][2], 3))
+        $("#output_tauzy").val(math.round(sigma[1][2], 3))
+        
+        $("#n1x").val(math.round(eigvec[0][0], 4))
+        $("#n1y").val(math.round(eigvec[0][1], 4))
+        $("#n1z").val(math.round(eigvec[0][2], 4))
+        $("#n2x").val(math.round(eigvec[1][0], 4))
+        $("#n2y").val(math.round(eigvec[1][1], 4))
+        $("#n2z").val(math.round(eigvec[1][2], 4))
+        $("#n3x").val(math.round(eigvec[2][0], 4))
+        $("#n3y").val(math.round(eigvec[2][1], 4))
+        $("#n3z").val(math.round(eigvec[2][2], 4))
+
+        drawArrows()
+    }
+
+    function update() {
+      var sigma = getInputStesses()
+      var R = calcRotationMatrix()
+      var sigma_new = math.multiply(R, math.multiply(sigma, math.transpose(R)))
+      var eigs = math.eigs(sigma_new)
+      updateResults(sigma_new, eigs)
+      drawCircles(eigs)
+    }
+
+    function sortVec(eig_val, eig_val_sorted, eig_vec) {
+      var index = [];
+      for (let i = 0; i < eig_val.length; i++) {
+        index.push(eig_val.indexOf(eig_val_sorted[i]))
+      }
+      var vec = [];
+      for (let i = 0; i < eig_vec.length; i++) {
+        vec.push(eig_vec[index[i]])
+      }
+      return vec
+    }
+
+    // Function to draw the grid
+    function drawGrid() {
+
+      // Set the stroke style for grid lines
+      ctx_main.strokeStyle = '#bbb';
+      ctx_main.lineWidth = 0.2;
+
+      // Draw vertical lines
+      for (let x = -x_offset; x <= width; x += gridSize) {
+        ctx_main.beginPath();
+        ctx_main.moveTo(x, 0);
+        ctx_main.lineTo(x, height);
+        ctx_main.stroke();
+      }
+
+      // Draw horizontal lines
+      for (let y = -y_offset; y <= height; y += gridSize) {
+        ctx_main.beginPath();
+        ctx_main.moveTo(0, y);
+        ctx_main.lineTo(width, y);
+        ctx_main.stroke();
+      }
+
+      // drawing axis
+      ctx_main.strokeStyle = 'rgb(100, 100, 100)';
+      ctx_main.lineWidth = '1';
+      ctx_main.beginPath();
+      ctx_main.moveTo(x_center, 0);
+      ctx_main.lineTo(x_center, 580);
+      ctx_main.stroke();
+
+      ctx_main.beginPath();
+      ctx_main.moveTo(0, 290);
+      ctx_main.lineTo(760, 290);
+      ctx_main.stroke();
+    }
+
+    function drawCircles(eigs) {
+
+      var eig_values = math.sort(eigs.values)
+
+      var sigma_1 = eig_values[2]
+      var sigma_2 = eig_values[1]
+      var sigma_3 = eig_values[0]
+
+      var tau_1 = (sigma_1 - sigma_3) / 2
+      var tau_2 = (sigma_1 - sigma_2) / 2
+      var tau_3 = (sigma_2 - sigma_3) / 2
+
+      var center1 = [(sigma_1 + sigma_3) / 2 + x_center, y_center];
+      var center2 = [(sigma_1 + sigma_2) / 2 + x_center, y_center];
+      var center3 = [(sigma_2 + sigma_3) / 2 + x_center, y_center];
+
+      ctx_main.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+
+      var radius_scale = 1
+      // Circle 1
+      ctx_main.beginPath();
+      ctx_main.arc(center1[0], center1[1], radius_scale * tau_1, 0, 2 * Math.PI);  // Draw a circle at (200, 200) with radius 100
+      ctx_main.strokeStyle = 'rgb(0, 0, 50)';  // Circle fill color
+      ctx_main.lineWidth = '2';  // Circle fill color
+      ctx_main.fillStyle = "rgb(245, 245, 245)"
+      ctx_main.fill()
+      ctx_main.stroke();  // Optional: Draw the border of the circle
+
+      // Circle 2
+      ctx_main.beginPath();
+      ctx_main.arc(center2[0], center2[1], radius_scale * tau_2, 0, 2 * Math.PI);  // Draw a circle at (200, 200) with radius 100
+      ctx_main.strokeStyle = 'rgb(0, 0, 255)';  // Circle fill color
+      ctx_main.lineWidth = '2';  // Circle fill color
+      ctx_main.fillStyle = "white"
+      ctx_main.fill()
+      ctx_main.stroke();  // Optional: Draw the border of the circle
+
+      // Circle 3
+      ctx_main.beginPath();
+      ctx_main.arc(center3[0], center3[1], radius_scale * tau_3, 0, 2 * Math.PI);  // Draw a circle at (200, 200) with radius 100
+      ctx_main.strokeStyle = 'rgb(255, 0, 0)';  // Circle fill color
+      ctx_main.lineWidth = '2';  // Circle fill color
+      ctx_main.fillStyle = "white"
+      ctx_main.fill()
+      ctx_main.stroke();  // Optional: Draw the border of the circle
+      drawGrid()
+
+      ctx_main.font = "40px Arial";
+      ctx_main.fillStyle = "#bbb";
+      ctx_main.fillText("σ", 710, 280);
+      ctx_main.fillText("𝜏", 390, 40);
+
+
+    }
+
+  </script>
+
+</body>
+
+</html>
